@@ -7,7 +7,7 @@ jobs:
     steps:
       - run:
           name: This should run after everything else
-          command: echo "CIRCLE_PR_NUMBER: ${CIRCLE_PR_NUMBER}"
+          command: echo "CIRCLE_PR_NUMBER ${CIRCLE_PR_NUMBER}"
 
 workflows:
   version: 2.1
