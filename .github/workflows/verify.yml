@@ -4,12 +4,30 @@ on:
     branches:
       - master
   pull_request:
+  workflow_dispatch:
 
 jobs:
-  cowsay:
-    runs-on: self-hosted
-    container: npalm/cowsay
-
+  test-linux-cpu:
+    runs-on: "linux.2xlarge"
     steps:
-      - uses: actions/checkout@v2
-      - run: cowsay -f ghostbusters "  Who ya gonna call?"
+      - name: Print runner information
+        run: cat /etc/os-release
+  test-linux-gpu:
+    runs-on: "linux.8xlarge.nvidia.gpu"
+    steps:
+      - name: Print runner information
+        run: cat /etc/os-release
+      - name: Print nvidia-smi
+        run: nvidia-smi
+  test-win-cpu:
+    runs-on: "win.2xlarge"
+    steps:
+      - name: Print runner information
+        run: (Get-WmiObject Win32_OperatingSystem).CSName
+  test-win-gpu:
+    runs-on: "win.8xlarge.nvidia.gpu"
+    steps:
+      - name: Print runner information
+        run: (Get-WmiObject Win32_OperatingSystem).CSName
+      - name: Print nvidia-smi
+        run: nvidia-smi
