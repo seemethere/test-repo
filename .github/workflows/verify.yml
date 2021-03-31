@@ -19,6 +19,7 @@ jobs:
         run: cat /etc/os-release
       - name: Install nvidia-smi
         run: |
+            sudo yum groupinstall -y "Development Tools"
             DRIVER_FN="NVIDIA-Linux-x86_64-460.39.run"
             wget "https://s3.amazonaws.com/ossci-linux/nvidia_driver/$DRIVER_FN"
             sudo /bin/bash "$DRIVER_FN" -s --no-drm || (sudo cat /var/log/nvidia-installer.log && false)
