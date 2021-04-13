@@ -1,7 +1,7 @@
 name: Reserve Github Actions Runner
 
 on:
-  workflow-dispatch:
+  repository_dispatch:
     inputs:
       runnerType:
         description: 'The type of runner you would like to reserve'
