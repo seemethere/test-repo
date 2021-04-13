@@ -9,9 +9,9 @@ on:
 
 jobs:
   reserve-runner:
-    runs-on: ${{ inputs.runnerType }}
+    runs-on: ${{ github.event.inputs.runnerType }}
     steps:
-      - name: Setup tmate session
+      - name: Setup tmate session for ${{ github.event.inputs.runnerType }}
         uses: mxschmitt/action-tmate@18c3652e863e41474701cc45349bfc24a902636e #v3.5
         timeout-minutes: 120 # 2 hours
         with:
