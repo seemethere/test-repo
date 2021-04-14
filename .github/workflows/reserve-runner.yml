@@ -12,7 +12,7 @@ jobs:
     runs-on: ${{ github.event.inputs.runnerType }}
     steps:
       - name: Setup tmate session for ${{ github.event.inputs.runnerType }}
-        uses: seemethere/action-tmate@b4969583bce5fa9a00428f967134d434dbc416f6
+        uses: seemethere/action-tmate@f708e7bca76af1b52bb8c8e5fe790ef5e01a4fc8
         timeout-minutes: 120 # 2 hours
         with:
           limit-access-to-actor: true
