@@ -25,12 +25,12 @@ jobs:
   #           sudo /bin/bash "$DRIVER_FN" -s --no-drm || (sudo cat /var/log/nvidia-installer.log && false)
   #           nvidia-smi
   test-win-cpu:
-    runs-on: "win.2xlarge"
+    runs-on: "windows.2xlarge"
     steps:
       - name: Print runner information
         run: (Get-WmiObject Win32_OperatingSystem).CSName
   test-win-gpu:
-    runs-on: "win.8xlarge.nvidia.gpu"
+    runs-on: "windows.8xlarge.nvidia.gpu"
     steps:
       - uses: actions/checkout@v2
       - name: Print runner information
