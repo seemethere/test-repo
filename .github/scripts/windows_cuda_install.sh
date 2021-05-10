@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -eux -o pipefail
 
 CUDA_VERSION="10.2"
@@ -39,9 +39,12 @@ mkdir cuda_install_logs
 
 set +e
 
-./setup.exe -s ${cuda_install_packages} -loglevel:6 -log:"$(pwd -W)/cuda_install_logs"
+./setup.exe -s "${cuda_install_packages}" -loglevel:6 -log:"$(pwd -W)/cuda_install_logs"
 
 set -e
+
+VC_YEAR=${VC_YEAR:-2019}
+VC_PRODUCT=${VC_PRODUCT:-BuildTools}
 
 if [[ "${VC_YEAR}" == "2017" ]]; then
     cp -r ${msbuild_project_dir}/* "C:/Program Files (x86)/Microsoft Visual Studio/2017/${VC_PRODUCT}/Common7/IDE/VC/VCTargets/BuildCustomizations/"
