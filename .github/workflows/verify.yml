@@ -29,6 +29,9 @@ jobs:
     steps:
       - name: Print runner information
         run: (Get-WmiObject Win32_OperatingSystem).CSName
+      - name: Install Visual Studio
+        run: |
+          .\.github\scripts\install_vs.ps1
   test-win-gpu:
     runs-on: "windows.8xlarge.nvidia.gpu"
     steps:
