@@ -1,6 +1,7 @@
 #!/bin/bash
 set -eux -o pipefail
 
+CUDA_VERSION="10.2"
 cuda_major_version=${CUDA_VERSION%.*}
 
 if [[ "$cuda_major_version" == "10" ]]; then
