@@ -36,9 +36,8 @@ jobs:
       - name: Print runner information
         run: (Get-WmiObject Win32_OperatingSystem).CSName
       - name: Install Visual Studio
-        shell: bash
         run: |
-          powershell .github/scripts/install_vs.ps1
+          .\.github\scripts\install_vs.ps1
       - name: Print nvidia-smi
         shell: bash
         run: |
