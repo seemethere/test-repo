@@ -24,43 +24,52 @@ jobs:
   #           wget "https://s3.amazonaws.com/ossci-linux/nvidia_driver/$DRIVER_FN"
   #           sudo /bin/bash "$DRIVER_FN" -s --no-drm || (sudo cat /var/log/nvidia-installer.log && false)
   #           nvidia-smi
-  test-win-default:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Print User name
-        run: |
-          [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
-      - name: Install Visual Studio
-        run: |
-          .\.github\scripts\install_vs.ps1
-  test-win-cpu:
+  build-win-cpu:
+    env:
+      BUILD_ENVIRONMENT: "pytorch-win-vs2019-cpu-py3"
+      SCCACHE_BUCKET: "ossci-compiler-cache"
+      CUDA_VERSION: "cpu"
+      PYTHON_VERSION: "3.6"
+      VC_VERSION: ""
+      VC_YEAR: "2019"
+      VC_PRODUCT: "BuildTools"
+      USE_CUDA: ""
+      TORCH_CUDA_ARCH_LIST: "5.2;7.5"
+      JOB_BASE_NAME: test
     runs-on: "windows.2xlarge"
     steps:
       - uses: actions/checkout@v2
-      - name: Print runner information
-        run: (Get-WmiObject Win32_OperatingSystem).CSName
-      - name: Print User name
+      - name: Clone pytorch
+        uses: actions/checkout@v2
+        with:
+          repository: 'pytorch/pytorch'
+          ref: 'nightly'
+          submodules: 'rescursive'
+          path: 'pytorch'
+      - name: Install Visual Studio 2019 toolchain
         run: |
-          [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
-      - name: Install Visual Studio
-        run: |
+          choco install vswhere -y
           .\.github\scripts\install_vs.ps1
-  test-win-gpu:
-    runs-on: "windows.8xlarge.nvidia.gpu"
-    steps:
-      - uses: actions/checkout@v2
-      - name: Print runner information
-        run: (Get-WmiObject Win32_OperatingSystem).CSName
-      - name: Print User name
+      - name: Build
+        shell: bash
         run: |
-          [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
-      - name: Install Visual Studio
-        run: |
-          .\.github\scripts\install_vs.ps1
-      - name: Install NVIDIA Dependencies
-        run: |
-          choco install cuda --version=10.1.243 -y
-          choco install nvidia-display-driver -y
-      - name: Print runner information
-        run: nvidia-smi
+          cd pytorch && .jenkins/pytorch/win-build.sh
+
+  # test-win-gpu:
+  #   runs-on: "windows.8xlarge.nvidia.gpu"
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: Print runner information
+  #       run: (Get-WmiObject Win32_OperatingSystem).CSName
+  #     - name: Print User name
+  #       run: |
+  #         [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
+  #     - name: Install Visual Studio
+  #       run: |
+  #         .\.github\scripts\install_vs.ps1
+  #     - name: Install NVIDIA Dependencies
+  #       run: |
+  #         choco install cuda --version=10.1.243 -y
+  #         choco install nvidia-display-driver -y
+  #     - name: Print runner information
+  #       run: nvidia-smi
