@@ -49,11 +49,17 @@ jobs:
       - name: Install Visual Studio 2019 toolchain
         run: |
           choco install vswhere -y
-          .\.github\scripts\install_vs.ps1
+          .\pytorch\.circleci\scripts\vs_install.ps1
       - name: Build
         shell: bash
         run: |
           cd pytorch && .jenkins/pytorch/win-build.sh
+      - name: Archive artifacts
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: windows-cpu
+          path: C:/w/build-results
 
   # test-win-gpu:
   #   runs-on: "windows.8xlarge.nvidia.gpu"
