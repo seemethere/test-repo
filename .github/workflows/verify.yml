@@ -50,6 +50,7 @@ jobs:
         run: |
           choco install vswhere -y
           .\pytorch\.circleci\scripts\vs_install.ps1
+          choco install visualstudio2019-workload-vctools -y
       - name: Build
         shell: bash
         run: |
