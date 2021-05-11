@@ -24,9 +24,20 @@ jobs:
   #           wget "https://s3.amazonaws.com/ossci-linux/nvidia_driver/$DRIVER_FN"
   #           sudo /bin/bash "$DRIVER_FN" -s --no-drm || (sudo cat /var/log/nvidia-installer.log && false)
   #           nvidia-smi
+  test-win-default:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Print User name
+        run: |
+          [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
+      - name: Install Visual Studio
+        run: |
+          .\.github\scripts\install_vs.ps1
   test-win-cpu:
     runs-on: "windows.2xlarge"
     steps:
+      - uses: actions/checkout@v2
       - name: Print runner information
         run: (Get-WmiObject Win32_OperatingSystem).CSName
       - name: Print User name
