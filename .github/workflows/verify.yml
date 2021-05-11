@@ -58,9 +58,9 @@ jobs:
       - name: Install Visual Studio
         run: |
           .\.github\scripts\install_vs.ps1
-      - name: Print nvidia-smi
-        shell: bash
+      - name: Install NVIDIA Dependencies
         run: |
-          .github/scripts/windows_cuda_install.sh
+          choco install cuda --version=10.1.243 -y
+          choco install nvidia-display-driver -y
       - name: Print runner information
         run: nvidia-smi
