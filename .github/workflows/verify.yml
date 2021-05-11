@@ -44,13 +44,15 @@ jobs:
         with:
           repository: 'pytorch/pytorch'
           ref: 'nightly'
-          submodules: 'rescursive'
+          submodules: 'recursive'
           path: 'pytorch'
       - name: Install Visual Studio 2019 toolchain
         run: |
           choco install vswhere -y
           .\pytorch\.circleci\scripts\vs_install.ps1
-          choco install visualstudio2019-workload-vctools -y
+      - name: Install Windows 10 SDK
+        run: |
+          .\.github\scripts\install_windows_sdk.ps1
       - name: Build
         shell: bash
         run: |
