@@ -34,6 +34,7 @@ jobs:
       VC_YEAR: "2019"
       VC_PRODUCT: "BuildTools"
       USE_CUDA: ""
+      USE_KINETO: "0"
       TORCH_CUDA_ARCH_LIST: "5.2;7.5"
       JOB_BASE_NAME: test
     runs-on: "windows.2xlarge"
