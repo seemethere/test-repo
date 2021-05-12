@@ -17,7 +17,7 @@ runner_types:
     max_available: 50
     disk_size: 100
   windows.2xlarge:
-    instance_type: c5.2xlarge
+    instance_type: c5.4xlarge
     os: windows
     max_available: 200
     disk_size: 256
