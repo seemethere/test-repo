@@ -29,7 +29,7 @@ jobs:
       BUILD_ENVIRONMENT: "pytorch-win-vs2019-cpu-py3"
       SCCACHE_BUCKET: "ossci-compiler-cache"
       CUDA_VERSION: "cpu"
-      PYTHON_VERSION: "3.6"
+      PYTHON_VERSION: "3.8"
       VC_VERSION: ""
       VC_YEAR: "2019"
       VC_PRODUCT: "BuildTools"
