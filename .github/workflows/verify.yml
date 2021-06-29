@@ -55,7 +55,7 @@ jobs:
         shell: bash
         run: |
           cd pytorch && .jenkins/pytorch/win-build.sh
-      # Upload to github so that people can click and download artifacts
+      # Upload to GitHub so that people can click and download artifacts
       - name: Upload artifacts to Github
         if: always()
         uses: actions/upload-artifact@v2
