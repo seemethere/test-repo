@@ -18,18 +18,15 @@ if (${env:INSTALL_WINDOWS_SDK} -eq "1") {
     $VS_INSTALL_ARGS += "--add Microsoft.VisualStudio.Component.Windows10SDK.19041"
 }
 
-curl.exe --retry 3 -kL $VS_DOWNLOAD_LINK --output vs_installer.exe
-if ($LASTEXITCODE -ne 0) {
-    echo "Download of the VS 2019 Version 16.8.6 installer failed"
-    exit 1
-}
-
 if (Test-Path "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe") {
     $existingPath = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -products "Microsoft.VisualStudio.Product.BuildTools" -version "[16, 17)" -property installationPath
     if ($existingPath -ne $null) {
         echo "Found existing BuildTools installation in $existingPath"
-        $VS_UNINSTALL_ARGS = @("uninstall", "--installPath", "-p", "`"$existingPath`"","--wait")
-        $process = Start-Process "${PWD}\vs_installer.exe" -ArgumentList $VS_UNINSTALL_ARGS -NoNewWindow -Wait -PassThru
+        echo "Removing all VS installers and installations"
+        & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\resources\app\layout\InstallCleanup.exe" -i
+        $process = Start-Process "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\resources\app\layout\InstallCleanup.exe" -ArgumentList @("-i") -NoNewWindow -Wait -PassThru
+        # $VS_UNINSTALL_ARGS = @("uninstall", "--installPath", "-p", "`"$existingPath`"","--wait")
+        # $process = Start-Process "${PWD}\vs_installer.exe" -ArgumentList $VS_UNINSTALL_ARGS -NoNewWindow -Wait -PassThru
         $exitCode = $process.ExitCode
         if (($exitCode -ne 0) -and ($exitCode -ne 3010)) {
             echo "Original BuildTools uninstall failed with code $exitCode"
@@ -37,6 +34,12 @@ if (Test-Path "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswher
         }
         echo "Original BuildTools uninstalled"
     }
+}
+
+curl.exe --retry 3 -kL $VS_DOWNLOAD_LINK --output vs_installer.exe
+if ($LASTEXITCODE -ne 0) {
+    echo "Download of the VS 2019 Version 16.8.6 installer failed"
+    exit 1
 }
 
 $process = Start-Process "${PWD}\vs_installer.exe" -ArgumentList $VS_INSTALL_ARGS -NoNewWindow -Wait -PassThru

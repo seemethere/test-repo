@@ -51,6 +51,8 @@ jobs:
         shell: powershell
         run: |
           .\.github\scripts\vs_install.ps1
+          .\.github\scripts\vs_install.ps1
+          .\.github\scripts\vs_install.ps1
       # - name: Build
       #   shell: bash
       #   run: |
@@ -126,6 +128,8 @@ jobs:
       - name: Install Visual Studio 2019 toolchain
         shell: powershell
         run: |
+          .\.github\scripts\vs_install.ps1
+          .\.github\scripts\vs_install.ps1
           .\.github\scripts\vs_install.ps1
       # - uses: seemethere/download-artifact-s3@0504774707cbc8603d7dca922e8026eb8bf3b47b
       #   name: Download PyTorch Build Artifacts
