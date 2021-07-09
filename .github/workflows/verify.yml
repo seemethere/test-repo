@@ -30,7 +30,7 @@ jobs:
       SCCACHE_BUCKET: "ossci-compiler-cache"
       CUDA_VERSION: "cpu"
       PYTHON_VERSION: "3.8"
-      VC_VERSION: ""
+      VC_VERSION: "16.8.6"
       VC_YEAR: "2019"
       VC_PRODUCT: "BuildTools"
       USE_CUDA: ""
@@ -104,6 +104,7 @@ jobs:
       JOB_BASE_NAME: pytorch-win-vs2019-cpu-py3-test
       NUM_TEST_SHARDS: 2
       TEST_CONFIG: ${{ matrix.test_config }}
+      VC_VERSION: "16.8.6"
     needs:
       - build-win-cpu
       - generate-test-matrix
