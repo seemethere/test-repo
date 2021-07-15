@@ -53,6 +53,8 @@ jobs:
           .\pytorch\.circleci\scripts\vs_install.ps1
       - name: Build
         shell: bash
+        env:
+          PYTORCH_FINAL_PACKAGE_DIR: /c/${{ github.run_id }}/build-results/
         run: |
           cd pytorch && .jenkins/pytorch/win-build.sh
       # Upload to GitHub so that people can click and download artifacts
@@ -65,7 +67,7 @@ jobs:
           retention-days: 14
           if-no-files-found: error
           name: ${{ env.BUILD_ENVIRONMENT }}
-          path: C:\w\build-results
+          path: C:\${{ github.run_id }}\build-results
       - name: Upload artifacts to s3
         if: always()
         uses: seemethere/upload-artifact-s3@9d7ceb0ab39c2c88d93ef7792b27425b27d59162
@@ -74,6 +76,12 @@ jobs:
           if-no-files-found: error
           name: ${{ env.BUILD_ENVIRONMENT }}
           path: C:\w\build-results
+      - name: Cleanup build-results
+        shell: bash
+        env:
+          PYTORCH_FINAL_PACKAGE_DIR: /c/${{ github.run_id }}/build-results/
+        run: |
+          rm -rf "${PYTORCH_FINAL_PACKAGE_DIR}"
   generate-test-matrix:
     runs-on: ubuntu-18.04
     env:
@@ -187,6 +195,7 @@ jobs:
       VC_YEAR: "2019"
       TORCH_CUDA_ARCH_LIST: "7.0"
       USE_CUDA: 1
+      JOB_BASE_NAME: pytorch-win-vs2019-cuda11-cudnn8-py3-build
     runs-on: "windows.2xlarge"
     steps:
       - uses: actions/checkout@v2
@@ -201,8 +210,18 @@ jobs:
         shell: powershell
         run: |
           .\pytorch\.circleci\scripts\vs_install.ps1
+      - name: Install Cuda
+        shell: bash
+        run: |
+          ./pytorch/.circleci/scripts/windows_cuda_install.sh
+      - name: Install Cudnn
+        shell: bash
+        run: |
+          ./pytorch/.circleci/scripts/windows_cudnn_install.sh
       - name: Build
         shell: bash
+        env:
+          PYTORCH_FINAL_PACKAGE_DIR: /c/${{ github.run_id }}/build-results/
         run: |
           cd pytorch && .jenkins/pytorch/win-build.sh
       # Upload to GitHub so that people can click and download artifacts
@@ -223,41 +242,22 @@ jobs:
           retention-days: 14
           if-no-files-found: error
           name: ${{ env.BUILD_ENVIRONMENT }}
-          path: C:\w\build-results
-  generate-test-matrix:
-    runs-on: ubuntu-18.04
-    env:
-      NUM_TEST_SHARDS: 2
-    outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
-    container:
-      image: python:3.9
-    steps:
-      - uses: actions/checkout@v2
-      - name: Clone pytorch
-        uses: actions/checkout@v2
-        with:
-          repository: 'pytorch/pytorch'
-          ref: 'nightly'
-          submodules: 'recursive'
-          path: 'pytorch'
-      - name: Generating test matrix
-        id: set-matrix
+          path: C:\${{ github.run_id }}\build-results
+      - name: Cleanup build-results
+        shell: bash
+        env:
+          PYTORCH_FINAL_PACKAGE_DIR: /c/${{ github.run_id }}/build-results/
         run: |
-          pip install typing_extensions
-          # outputting for debugging purposes
-          MATRIX=$(python ./pytorch/.github/scripts/generate_pytorch_test_matrix.py)
-          echo "${MATRIX}"
-          echo "::set-output name=matrix::${MATRIX}"
-  test:
+          rm -rf "${PYTORCH_FINAL_PACKAGE_DIR}"
+  test-gpu:
     runs-on: windows.2xlarge
     env:
-      JOB_BASE_NAME: pytorch-win-vs2019-cpu-py3-test
-      NUM_TEST_SHARDS: 2
-      TEST_CONFIG: ${{ matrix.test_config }}
+      JOB_BASE_NAME: pytorch-win-vs2019-cuda11-cudnn8-py3-test
+      SHARD_NUMBER: ${{ matrix.shard }}
+      NUM_TEST_SHARDS: ${{ matrix.num_shards }}
       VS_VERSION: "16.8.6"
     needs:
-      - build-win-cpu
+      - build-win-gpu
       - generate-test-matrix
     strategy:
       matrix: ${{ fromJson(needs.generate-test-matrix.outputs.matrix) }}
@@ -279,6 +279,14 @@ jobs:
         shell: powershell
         run: |
           .\.github\scripts\vs_install.ps1
+      - name: Install Cuda
+        shell: bash
+        run: |
+          ./pytorch/.circleci/scripts/windows_cuda_install.sh
+      - name: Install Cudnn
+        shell: bash
+        run: |
+          ./pytorch/.circleci/scripts/windows_cudnn_install.sh
       - uses: seemethere/download-artifact-s3@0504774707cbc8603d7dca922e8026eb8bf3b47b
         name: Download PyTorch Build Artifacts
         with:
