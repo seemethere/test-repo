@@ -75,7 +75,7 @@ jobs:
           retention-days: 14
           if-no-files-found: error
           name: ${{ env.BUILD_ENVIRONMENT }}
-          path: C:\w\build-results
+          path: C:\${{ github.run_id }}\build-results
       - name: Cleanup build-results
         shell: bash
         env:
@@ -85,6 +85,7 @@ jobs:
   generate-test-matrix:
     runs-on: ubuntu-18.04
     env:
+      TEST_RUNNER_TYPE: windows.2xlarge
       NUM_TEST_SHARDS: 2
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
@@ -96,7 +97,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: 'pytorch/pytorch'
-          ref: 'nightly'
+          ref: 'master'
           submodules: 'recursive'
           path: 'pytorch'
       - name: Generating test matrix
@@ -112,8 +113,10 @@ jobs:
     env:
       JOB_BASE_NAME: pytorch-win-vs2019-cpu-py3-test
       NUM_TEST_SHARDS: 2
-      TEST_CONFIG: ${{ matrix.test_config }}
+      TEST_CONFIG: ${{ matrix.config }}
+      SHARD_NUMBER: ${{ matrix.shard }}
       VS_VERSION: "16.8.6"
+      BUILD_ENVIRONMENT: "pytorch-win-vs2019-cpu-py3"
     needs:
       - build-win-cpu
       - generate-test-matrix
@@ -164,7 +167,7 @@ jobs:
             if [[ -n $GITHUB_HEAD_REF && "$USE_CUDA" == 1 ]]; then
               export RUN_SMOKE_TESTS_ONLY=1
             fi
-            ./pytorch/.jenkins/pytorch/win-test.sh
+            pushd pytorch && .jenkins/pytorch/win-test.sh && popd
       - name: Zip test reports for upload
         if: always()
         shell: powershell
@@ -234,7 +237,7 @@ jobs:
           retention-days: 14
           if-no-files-found: error
           name: ${{ env.BUILD_ENVIRONMENT }}
-          path: C:\w\build-results
+          path: C:\${{ github.run_id }}\build-results
       - name: Upload artifacts to s3
         if: always()
         uses: seemethere/upload-artifact-s3@9d7ceb0ab39c2c88d93ef7792b27425b27d59162
@@ -252,10 +255,22 @@ jobs:
   test-gpu:
     runs-on: windows.2xlarge
     env:
+      BUILD_ENVIRONMENT: pytorch-win-vs2019-cuda11-cudnn8-py3
       JOB_BASE_NAME: pytorch-win-vs2019-cuda11-cudnn8-py3-test
       SHARD_NUMBER: ${{ matrix.shard }}
+      TEST_CONFIG: ${{ matrix.config }}
       NUM_TEST_SHARDS: ${{ matrix.num_shards }}
+      CUDA_VERSION: "11.1"
+      IN_CI: 1
+      INSTALL_WINDOWS_SDK: 1
+      PYTHON_VERSION: "3.8"
+      SCCACHE_BUCKET: "ossci-compiler-cache"
+      VC_PRODUCT: "BuildTools"
+      VC_VERSION: ""
       VS_VERSION: "16.8.6"
+      VC_YEAR: "2019"
+      TORCH_CUDA_ARCH_LIST: "7.0"
+      USE_CUDA: 1
     needs:
       - build-win-gpu
       - generate-test-matrix
@@ -314,7 +329,7 @@ jobs:
             if [[ -n $GITHUB_HEAD_REF && "$USE_CUDA" == 1 ]]; then
               export RUN_SMOKE_TESTS_ONLY=1
             fi
-            ./pytorch/.jenkins/pytorch/win-test.sh
+            pushd pytorch && .jenkins/pytorch/win-test.sh && popd
       - name: Zip test reports for upload
         if: always()
         shell: powershell
