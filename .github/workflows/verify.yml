@@ -6,6 +6,16 @@ on:
   pull_request:
   workflow_dispatch:
 
+env:
+  SCCACHE_BUCKET: "ossci-compiler-cache"
+  PYTHON_VERSION: "3.8"
+  IN_CI: 1
+  INSTALL_WINDOWS_SDK: 1
+  VC_PRODUCT: "BuildTools"
+  VC_VERSION: ""
+  VS_VERSION: "16.8.6"
+  VC_YEAR: "2019"
+
 jobs:
   # test-linux-cpu:
   #   runs-on: "linux.2xlarge"
@@ -27,14 +37,8 @@ jobs:
   build-win-cpu:
     env:
       BUILD_ENVIRONMENT: "pytorch-win-vs2019-cpu-py3"
-      SCCACHE_BUCKET: "ossci-compiler-cache"
       CUDA_VERSION: "cpu"
-      PYTHON_VERSION: "3.8"
-      VS_VERSION: "16.8.6"
-      VC_YEAR: "2019"
-      VC_PRODUCT: "BuildTools"
       USE_CUDA: ""
-      USE_KINETO: "0"
       TORCH_CUDA_ARCH_LIST: "5.2;7.5"
       JOB_BASE_NAME: test
     runs-on: "windows.2xlarge"
@@ -115,7 +119,6 @@ jobs:
       NUM_TEST_SHARDS: 2
       TEST_CONFIG: ${{ matrix.config }}
       SHARD_NUMBER: ${{ matrix.shard }}
-      VS_VERSION: "16.8.6"
       BUILD_ENVIRONMENT: "pytorch-win-vs2019-cpu-py3"
     needs:
       - build-win-cpu
@@ -180,14 +183,6 @@ jobs:
       BUILD_ENVIRONMENT: pytorch-win-vs2019-cuda11-cudnn8-py3
       BUILD_WHEEL: 1
       CUDA_VERSION: "11.1"
-      IN_CI: 1
-      INSTALL_WINDOWS_SDK: 1
-      PYTHON_VERSION: "3.8"
-      SCCACHE_BUCKET: "ossci-compiler-cache"
-      VC_PRODUCT: "BuildTools"
-      VC_VERSION: ""
-      VS_VERSION: "16.8.6"
-      VC_YEAR: "2019"
       TORCH_CUDA_ARCH_LIST: "7.0"
       USE_CUDA: 1
       JOB_BASE_NAME: pytorch-win-vs2019-cuda11-cudnn8-py3-build
@@ -250,17 +245,8 @@ jobs:
       BUILD_ENVIRONMENT: pytorch-win-vs2019-cuda11-cudnn8-py3
       JOB_BASE_NAME: pytorch-win-vs2019-cuda11-cudnn8-py3-test
       SHARD_NUMBER: ${{ matrix.shard }}
-      TEST_CONFIG: ${{ matrix.config }}
       NUM_TEST_SHARDS: ${{ matrix.num_shards }}
       CUDA_VERSION: "11.1"
-      IN_CI: 1
-      INSTALL_WINDOWS_SDK: 1
-      PYTHON_VERSION: "3.8"
-      SCCACHE_BUCKET: "ossci-compiler-cache"
-      VC_PRODUCT: "BuildTools"
-      VC_VERSION: ""
-      VS_VERSION: "16.8.6"
-      VC_YEAR: "2019"
       TORCH_CUDA_ARCH_LIST: "7.0"
       USE_CUDA: 1
     needs:
