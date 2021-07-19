@@ -48,7 +48,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: 'pytorch/pytorch'
-          ref: 'master'
+          ref: 'nightly'
           submodules: 'recursive'
           path: 'pytorch'
       - name: Install Visual Studio 2019 toolchain
@@ -101,7 +101,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: 'pytorch/pytorch'
-          ref: 'master'
+          ref: 'nightly'
           submodules: 'recursive'
           path: 'pytorch'
       - name: Generating test matrix
@@ -132,7 +132,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: 'pytorch/pytorch'
-          ref: 'master'
+          ref: 'nightly'
           submodules: 'recursive'
           path: 'pytorch'
       - name: Clean workspace (including things in .gitignore)
@@ -193,7 +193,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: 'pytorch/pytorch'
-          ref: 'master'
+          ref: 'nightly'
           submodules: 'recursive'
           path: 'pytorch'
       - name: Install Visual Studio 2019 toolchain
@@ -261,7 +261,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: 'pytorch/pytorch'
-          ref: 'master'
+          ref: 'nightly'
           submodules: 'recursive'
           path: 'pytorch'
       - name: Clean workspace (including things in .gitignore)
