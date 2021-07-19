@@ -47,8 +47,8 @@ jobs:
       - name: Clone pytorch
         uses: actions/checkout@v2
         with:
-          repository: 'pytorch/pytorch'
-          ref: 'nightly'
+          repository: 'janeyx99/pytorch'
+          ref: 'reorder-lines-4-gflags'
           submodules: 'recursive'
           path: 'pytorch'
       - name: Install Visual Studio 2019 toolchain
@@ -100,8 +100,8 @@ jobs:
       - name: Clone pytorch
         uses: actions/checkout@v2
         with:
-          repository: 'pytorch/pytorch'
-          ref: 'nightly'
+          repository: 'janeyx99/pytorch'
+          ref: 'reorder-lines-4-gflags'
           submodules: 'recursive'
           path: 'pytorch'
       - name: Generating test matrix
@@ -131,8 +131,8 @@ jobs:
       - name: Clone pytorch
         uses: actions/checkout@v2
         with:
-          repository: 'pytorch/pytorch'
-          ref: 'nightly'
+          repository: 'janeyx99/pytorch'
+          ref: 'reorder-lines-4-gflags'
           submodules: 'recursive'
           path: 'pytorch'
       - name: Clean workspace (including things in .gitignore)
@@ -192,8 +192,8 @@ jobs:
       - name: Clone pytorch
         uses: actions/checkout@v2
         with:
-          repository: 'pytorch/pytorch'
-          ref: 'nightly'
+          repository: 'janeyx99/pytorch'
+          ref: 'reorder-lines-4-gflags'
           submodules: 'recursive'
           path: 'pytorch'
       - name: Install Visual Studio 2019 toolchain
@@ -260,8 +260,8 @@ jobs:
       - name: Clone pytorch
         uses: actions/checkout@v2
         with:
-          repository: 'pytorch/pytorch'
-          ref: 'nightly'
+          repository: 'janeyx99/pytorch'
+          ref: 'reorder-lines-4-gflags'
           submodules: 'recursive'
           path: 'pytorch'
       - name: Clean workspace (including things in .gitignore)
