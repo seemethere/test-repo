@@ -240,7 +240,7 @@ jobs:
         run: |
           rm -rf "${PYTORCH_FINAL_PACKAGE_DIR}"
   test-gpu:
-    runs-on: windows.2xlarge
+    runs-on: windows.8xlarge.nvidia.gpu
     env:
       BUILD_ENVIRONMENT: pytorch-win-vs2019-cuda11-cudnn8-py3
       JOB_BASE_NAME: pytorch-win-vs2019-cuda11-cudnn8-py3-test
