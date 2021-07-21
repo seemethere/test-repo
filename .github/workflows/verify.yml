@@ -186,7 +186,7 @@ jobs:
       TORCH_CUDA_ARCH_LIST: "7.0"
       USE_CUDA: 1
       JOB_BASE_NAME: pytorch-win-vs2019-cuda11-cudnn8-py3-build
-    runs-on: "windows.2xlarge"
+    runs-on: "windows.8xlarge.nvidia.gpu"
     steps:
       - uses: actions/checkout@v2
       - name: Clone pytorch
@@ -240,7 +240,7 @@ jobs:
         run: |
           rm -rf "${PYTORCH_FINAL_PACKAGE_DIR}"
   test-gpu:
-    runs-on: windows.8xlarge.nvidia.gpu
+    runs-on: "windows.8xlarge.nvidia.gpu"
     env:
       BUILD_ENVIRONMENT: pytorch-win-vs2019-cuda11-cudnn8-py3
       JOB_BASE_NAME: pytorch-win-vs2019-cuda11-cudnn8-py3-test
