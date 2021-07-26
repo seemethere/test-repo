@@ -29,3 +29,7 @@ jobs:
             echo "."
             sleep 5
           done
+      - name: Kill active ssh sessions if still around (Useful if workflow was cancelled)
+        if: always()
+        run: |
+          pkill --signal HUP sshd || true
