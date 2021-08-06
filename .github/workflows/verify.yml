@@ -33,3 +33,13 @@ jobs:
         if: always()
         run: |
           pkill --signal HUP sshd || true
+  test-windows:
+    runs-on: "windows.2xlarge"
+    steps:
+      - name: Enable SSH (Click me for details)
+        uses: seemethere/add-github-ssh-key@v1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Sleep for 30 minutes to allow the user to login
+        run: |
+          Start-Sleep -s 1800
