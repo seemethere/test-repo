@@ -36,10 +36,20 @@ jobs:
   test-windows:
     runs-on: "windows.2xlarge"
     steps:
+      - uses: actions/checkout@v2
       - name: Enable SSH (Click me for details)
         uses: seemethere/add-github-ssh-key@v1
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Sleep for 30 minutes to allow the user to login
+      - name: Sleep for 60 seconds to allow the user to login
         run: |
-          Start-Sleep -s 1800
+          Start-Sleep -s 60
+      - name: Wait until all sessions have drained
+        if: always()
+        timeout-minutes: 120
+        run: |
+          .github\scripts\wait_for_ssh_sessions.ps1
+      - name: Kill active ssh sessions if still around (Useful if workflow was cancelled)
+        if: always()
+        run: |
+          .github\scripts\kill_ssh_sessions_for_user.ps1
