@@ -10,41 +10,46 @@ jobs:
   test-linux-cpu:
     runs-on: "linux.2xlarge"
     steps:
-      - name: Print runner information
-        run: cat /etc/os-release
-  test-linux-gpu:
-    runs-on: "linux.8xlarge.nvidia.gpu"
-    steps:
-      - name: Print runner information
-        run: cat /etc/os-release
-      - name: Install nvidia-smi
+      - name: Enable SSH (Click me for details)
+        uses: seemethere/add-github-ssh-key@v1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Sleep for ~60 seconds to allow the user to login
         run: |
-            sudo yum groupinstall -y "Development Tools"
-            DRIVER_FN="NVIDIA-Linux-x86_64-460.39.run"
-            wget "https://s3.amazonaws.com/ossci-linux/nvidia_driver/$DRIVER_FN"
-            sudo /bin/bash "$DRIVER_FN" -s --no-drm || (sudo cat /var/log/nvidia-installer.log && false)
-            nvidia-smi
-  # test-win-cpu:
-  #   runs-on: "win.2xlarge"
-  #   steps:
-  #     - name: Print runner information
-  #       run: (Get-WmiObject Win32_OperatingSystem).CSName
-  # test-win-gpu:
-  #   runs-on: "win.8xlarge.nvidia.gpu"
-  #   steps:
-  #     - name: Print runner information
-  #       run: (Get-WmiObject Win32_OperatingSystem).CSName
-  #     - name: Print nvidia-smi
-  #       shell: bash
-  #       run: |
-  #         cuda_installer_link="https://ossci-windows.s3.amazonaws.com/${cuda_installer_name}.exe"
-
-  #         curl --retry 3 -kLO $cuda_installer_link
-  #         7z x ${cuda_installer_name}.exe -o${cuda_installer_name}
-  #         cd ${cuda_installer_name}
-  #         mkdir cuda_install_logs
-
-  #         set +e
-
-  #         ./setup.exe -s ${cuda_install_packages} -loglevel:6 -log:"$(pwd -W)/cuda_install_logs"
-  #         nvidia-smi
+          for num in $(seq 12); do
+            echo "${num}"
+            who
+            sleep 5
+          done
+      - name: Sleep for ~30 minutes, kill on user logout
+        timeout-minutes: 30
+        run: |
+          echo "Holding runner until all ssh sessions have logged out"
+          while [[ "$(who)" != "" ]]; do
+            echo "."
+            sleep 5
+          done
+      - name: Kill active ssh sessions if still around (Useful if workflow was cancelled)
+        if: always()
+        run: |
+          pkill --signal HUP sshd || true
+  test-windows:
+    runs-on: "windows.2xlarge"
+    steps:
+      - uses: actions/checkout@v2
+      - name: Enable SSH (Click me for details)
+        uses: seemethere/add-github-ssh-key@v1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Sleep for 60 seconds to allow the user to login
+        run: |
+          Start-Sleep -s 60
+      - name: Wait until all sessions have drained
+        if: always()
+        timeout-minutes: 120
+        run: |
+          .github\scripts\wait_for_ssh_sessions.ps1
+      - name: Kill active ssh sessions if still around (Useful if workflow was cancelled)
+        if: always()
+        run: |
+          .github\scripts\kill_ssh_sessions_for_user.ps1
