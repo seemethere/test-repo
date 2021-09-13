@@ -17,33 +17,7 @@ env:
   VC_YEAR: "2019"
 
 jobs:
-  generate-test-matrix:
-    runs-on: ubuntu-18.04
-    env:
-      TEST_RUNNER_TYPE: windows.2xlarge
-      NUM_TEST_SHARDS: 2
-    outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
-    container:
-      image: python:3.9
-    steps:
-      - uses: actions/checkout@v2
-      - name: Clone pytorch
-        uses: actions/checkout@v2
-        with:
-          repository: 'pytorch/pytorch'
-          ref: 'gh/seemethere/150/head'
-          submodules: 'recursive'
-          path: 'pytorch'
-      - name: Generating test matrix
-        id: set-matrix
-        run: |
-          pip install typing_extensions
-          # outputting for debugging purposes
-          MATRIX=$(python ./pytorch/.github/scripts/generate_pytorch_test_matrix.py)
-          echo "${MATRIX}"
-          echo "::set-output name=matrix::${MATRIX}"
-  build-win-gpu:
+  test-cuda-scripts:
     env:
       BUILD_ENVIRONMENT: pytorch-win-vs2019-cuda11-cudnn8-py3
       BUILD_WHEEL: 1
@@ -58,7 +32,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: 'pytorch/pytorch'
-          ref: 'gh/seemethere/150/head'
+          ref: 'gh/seemethere/151/head'
           submodules: 'recursive'
           path: 'pytorch'
       - name: Install Visual Studio 2019 toolchain
@@ -73,110 +47,3 @@ jobs:
         shell: bash
         run: |
           ./pytorch/.circleci/scripts/windows_cudnn_install.sh
-      - name: Build
-        shell: bash
-        env:
-          PYTORCH_FINAL_PACKAGE_DIR: /c/${{ github.run_id }}/build-results/
-        run: |
-          cd pytorch && .jenkins/pytorch/win-build.sh
-      # Upload to GitHub so that people can click and download artifacts
-      - name: Upload artifacts to Github
-        if: always()
-        uses: actions/upload-artifact@v2
-        # Don't fail on upload to GH since it's only for user convenience
-        continue-on-error: true
-        with:
-          retention-days: 14
-          if-no-files-found: error
-          name: ${{ env.BUILD_ENVIRONMENT }}
-          path: C:\${{ github.run_id }}\build-results
-      - name: Upload artifacts to s3
-        if: always()
-        uses: seemethere/upload-artifact-s3@9d7ceb0ab39c2c88d93ef7792b27425b27d59162
-        with:
-          retention-days: 14
-          if-no-files-found: error
-          name: ${{ env.BUILD_ENVIRONMENT }}
-          path: C:\${{ github.run_id }}\build-results
-      - name: Cleanup build-results
-        shell: bash
-        env:
-          PYTORCH_FINAL_PACKAGE_DIR: /c/${{ github.run_id }}/build-results/
-        run: |
-          rm -rf "${PYTORCH_FINAL_PACKAGE_DIR}"
-  test-gpu:
-    runs-on: "windows.8xlarge.nvidia.gpu"
-    env:
-      BUILD_ENVIRONMENT: pytorch-win-vs2019-cuda11-cudnn8-py3
-      JOB_BASE_NAME: pytorch-win-vs2019-cuda11-cudnn8-py3-test
-      SHARD_NUMBER: ${{ matrix.shard }}
-      NUM_TEST_SHARDS: ${{ matrix.num_shards }}
-      CUDA_VERSION: "11.1"
-      TORCH_CUDA_ARCH_LIST: "7.0"
-      USE_CUDA: 1
-    needs:
-      - build-win-gpu
-      - generate-test-matrix
-    strategy:
-      matrix: ${{ fromJson(needs.generate-test-matrix.outputs.matrix) }}
-      fail-fast: false
-    steps:
-      - uses: actions/checkout@v2
-      - name: Clone pytorch
-        uses: actions/checkout@v2
-        with:
-          repository: 'pytorch/pytorch'
-          ref: 'gh/seemethere/150/head'
-          submodules: 'recursive'
-          path: 'pytorch'
-      - name: Clean workspace (including things in .gitignore)
-        shell: bash
-        run: |
-          git clean -xdf
-      - name: Install Visual Studio 2019 toolchain
-        shell: powershell
-        run: |
-          .\.github\scripts\vs_install.ps1
-      - name: Install Cuda
-        shell: bash
-        run: |
-          ./pytorch/.circleci/scripts/windows_cuda_install.sh
-      - name: Install Cudnn
-        shell: bash
-        run: |
-          ./pytorch/.circleci/scripts/windows_cudnn_install.sh
-      - uses: seemethere/download-artifact-s3@0504774707cbc8603d7dca922e8026eb8bf3b47b
-        name: Download PyTorch Build Artifacts
-        with:
-          name: ${{ env.BUILD_ENVIRONMENT }}
-          path: C:\${{ github.run_id }}\build-results
-      - name: Check build-results folder
-        shell: powershell
-        run: |
-          tree /F C:\$Env:GITHUB_RUN_ID\build-results
-      # Needed for coverage in win-test.sh
-      - uses: actions/setup-python@v2
-        name: Setup Python3
-        with:
-          python-version: '3.x'
-      - name: Run test scripts
-        shell: bash
-        env:
-          PYTORCH_FINAL_PACKAGE_DIR: /c/${{ github.run_id }}/build-results/
-        run: |
-            pushd pytorch && .jenkins/pytorch/win-test.sh && popd
-      - name: Zip test reports for upload
-        if: always()
-        shell: powershell
-        run: |
-          # -ir => recursive include all files in pattern
-          cd pytorch && 7z a "test-reports-$Env:TEST_CONFIG.zip" -ir'!test\*.xml'
-      - uses: actions/upload-artifact@v2
-        name: Store PyTorch Test Reports
-        if: always()
-        with:
-          name: test-reports
-          retention-days: 14
-          if-no-files-found: error
-          path:
-            test-reports-*.zip
