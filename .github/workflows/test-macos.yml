@@ -1,0 +1,12 @@
+name: Testing macOS miniconda
+
+on:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: macos-10.15
+    steps:
+      - name: Attempt to create a conda environment
+        run: |
+          conda create -y -p ${RUNNER_TEMP}/build python=3.9
