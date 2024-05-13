@@ -1,0 +1,22 @@
+on:
+  pull_request_review:
+    types: [submitted]
+
+jobs:
+  add_ciflow_trunk:
+    if: github.event.review.state == 'APPROVED'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['ciflow/trunk']
+            })
+
