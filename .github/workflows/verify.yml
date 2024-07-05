@@ -10,5 +10,9 @@ jobs:
   test-linux-cpu:
     runs-on: "linux.2xlarge"
     steps:
+      - name: error if file exists
+        run: if [[ -e my-file ]]; then exit 1; fi
       - name: check os
         run: cat /etc/os-release
+      - name: create file
+        run: touch my-file
