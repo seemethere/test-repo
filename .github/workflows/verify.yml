@@ -10,5 +10,5 @@ jobs:
   test-linux-cpu:
     runs-on: "linux.2xlarge"
     steps:
-      - name: sleep for a long time
-        run: sleep 10000
+      - name: check os
+        run: cat /etc/os-release
