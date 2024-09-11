@@ -7,12 +7,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  test-linux-cpu:
-    runs-on: "linux.2xlarge"
+  test-linux-gpu:
+    runs-on: "my-special-gpu-friend"
     steps:
-      - name: error if file exists
-        run: if [[ -e my-file ]]; then exit 1; fi
-      - name: check os
-        run: cat /etc/os-release
-      - name: create file
-        run: touch my-file
+      - name: can I run docker with gpus to an assigned GPU?
+        run: docker run --rm -it --gpus="device=$(cat ~/.assigned_gpu)" pytorch/pytorch nvidia-smi
