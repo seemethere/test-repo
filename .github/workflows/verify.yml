@@ -11,4 +11,4 @@ jobs:
     runs-on: "my-special-gpu-friend"
     steps:
       - name: can I run docker with gpus to an assigned GPU?
-        run: docker run --rm -it --gpus="device=$(cat ~/.assigned_gpu)" pytorch/pytorch nvidia-smi
+        run: docker run --rm -i --gpus="device=$(cat ~/.assigned_gpu)" pytorch/pytorch nvidia-smi
